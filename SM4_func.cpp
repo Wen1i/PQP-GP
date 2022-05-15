@@ -4,10 +4,10 @@
 #include<immintrin.h>
 using namespace std;
 
-/* ÓÃÓÚ³õÊ¼»¯µÄ0~ff~0 */
+/* ç”¨äºåˆå§‹åŒ–çš„0~ff~0 */
 static const unsigned char initial[16] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10 };
 
-/* SºĞ */
+/* Sç›’ */
 static const unsigned char SboxTable[16][16] =
 {
 {0xd6,0x90,0xe9,0xfe,0xcc,0xe1,0x3d,0xb7,0x16,0xb6,0x14,0xc2,0x28,0xfb,0x2c,0x05},
@@ -28,10 +28,10 @@ static const unsigned char SboxTable[16][16] =
 {0x18,0xf0,0x7d,0xec,0x3a,0xdc,0x4d,0x20,0x79,0xee,0x5f,0x3e,0xd7,0xcb,0x39,0x48}
 };
 
-/*  ÏµÍ³²ÎÊıFK  */
+/*  ç³»ç»Ÿå‚æ•°FK  */
 static const unsigned long FK[4] = { 0xa3b1bac6,0x56aa3350,0x677d9197,0xb27022dc };
 
-/*  CK_i,j=(4*i+j)*7%256 ,Ã¿´ÎÉú³ÉÂÖÃÜÔ¿¶¼ÒªÒ»¸öck */
+/*  CK_i,j=(4*i+j)*7%256 ,æ¯æ¬¡ç”Ÿæˆè½®å¯†é’¥éƒ½è¦ä¸€ä¸ªck */
 static const unsigned long CK[32] =
 {
 0x00070e15,0x1c232a31,0x383f464d,0x545b6269,
@@ -44,9 +44,9 @@ static const unsigned long CK[32] =
 0x10171e25,0x2c333a41,0x484f565d,0x646b7279
 };
 
-/* ·µ»Ø¹ıSºĞµÄ½á¹û
-\param  index <unsigned char>  ÈëSºĞ
-\return ans <unsigned char>    ³öSºĞ
+/* è¿”å›è¿‡Sç›’çš„ç»“æœ
+\param  index <unsigned char>  å…¥Sç›’
+\return ans <unsigned char>    å‡ºSç›’
 */
 unsigned char sm4Sbox(unsigned char index)
 {
@@ -55,9 +55,9 @@ unsigned char sm4Sbox(unsigned char index)
 	return ans;
 }
 
-/* ÎŞ·ûºÅcharÊı×é×ªÎŞ·ûºÅlongĞÍ
-* \param  in <unsigned char*>  ÎŞ·ûºÅcharÊı×é
-*         out <unsigned long*> ÎŞ·ûºÅlong
+/* æ— ç¬¦å·charæ•°ç»„è½¬æ— ç¬¦å·longå‹
+* \param  in <unsigned char*>  æ— ç¬¦å·charæ•°ç»„
+*         out <unsigned long*> æ— ç¬¦å·long
 */
 void uchar_ulong(unsigned char* in, unsigned long* out)
 {
@@ -66,9 +66,9 @@ void uchar_ulong(unsigned char* in, unsigned long* out)
 		*out = ((unsigned long)in[i] << (24 - i * 8)) ^ *out;
 }
 
-/* ÎŞ·ûºÅlong×ªÎŞ·ûºÅcharÊı×é
-* \param  in <unsigned long>   ÎŞ·ûºÅlong
-*         out <unsigned char*> ÎŞ·ûºÅcharÊı×é
+/* æ— ç¬¦å·longè½¬æ— ç¬¦å·charæ•°ç»„
+* \param  in <unsigned long>   æ— ç¬¦å·long
+*         out <unsigned char*> æ— ç¬¦å·charæ•°ç»„
 */
 void ulong_uchar(unsigned long in, unsigned char* out)
 {
@@ -77,19 +77,19 @@ void ulong_uchar(unsigned long in, unsigned char* out)
 		*(out + i) = (unsigned long)(in >> (24 - i * 8));
 }
 
-/* Ñ­»·×óÒÆ
-*\param  x <unsigned long>  ĞèÒªÑ­»·×óÒÆµÄÊı
-*        n <int>            ×óÒÆÎ»Êı
-*\return Ñ­»·×óÒÆµÄ½á¹û  
+/* å¾ªç¯å·¦ç§»
+*\param  x <unsigned long>  éœ€è¦å¾ªç¯å·¦ç§»çš„æ•°
+*        n <int>            å·¦ç§»ä½æ•°
+*\return å¾ªç¯å·¦ç§»çš„ç»“æœ  
 */
 unsigned long rotleft(unsigned long x, int n)
 {
 	return ((x & 0xFFFFFFFF) << n) | (x >> (32 - n));
 }
 
-/* ½»»»£ºÔÚÉèÖÃ½âÃÜÃÜÔ¿µÄÊ±ºòÓÃµ½
-*\param  a  ½»»»1
-*        b  ½»»»2
+/* äº¤æ¢ï¼šåœ¨è®¾ç½®è§£å¯†å¯†é’¥çš„æ—¶å€™ç”¨åˆ°
+*\param  a  äº¤æ¢1
+*        b  äº¤æ¢2
 */
 void swap(unsigned long* a, unsigned long* b)
 {
@@ -99,39 +99,39 @@ void swap(unsigned long* a, unsigned long* b)
 	*b = tmp;
 }
 
-/* ºÏ³ÉÖÃ»»T 
-*\param  in <unsigned long> TÖÃ»»µÄÊäÈë£ºËÄ¸ö32-bitµÄÒì»ò½á¹û
-*\return C <unsigned long> TÖÃ»»µÄÊä³ö
+/* åˆæˆç½®æ¢T 
+*\param  in <unsigned long> Tç½®æ¢çš„è¾“å…¥ï¼šå››ä¸ª32-bitçš„å¼‚æˆ–ç»“æœ
+*\return C <unsigned long> Tç½®æ¢çš„è¾“å‡º
 */
 unsigned long sm4T(unsigned long in)
 {
 	unsigned char sin[4];
-	unsigned char sout[4];//·ÇÏßĞÔ±ä»»µÄÊäÈësin¡¢Êä³ösout
+	unsigned char sout[4];//éçº¿æ€§å˜æ¢çš„è¾“å…¥sinã€è¾“å‡ºsout
 	ulong_uchar(in, sin);
 	sout[0] = sm4Sbox(sin[0]);
 	sout[1] = sm4Sbox(sin[1]);
 	sout[2] = sm4Sbox(sin[2]);
 	sout[3] = sm4Sbox(sin[3]);
-    unsigned long B, C;//ÏßĞÔ±ä»»LµÄÊäÈëB¡¢Êä³öC
+    unsigned long B, C;//çº¿æ€§å˜æ¢Lçš„è¾“å…¥Bã€è¾“å‡ºC
 	uchar_ulong(sout, &B);
 	C = B ^ (rotleft(B, 2)) ^ (rotleft(B, 10)) ^ (rotleft(B, 18)) ^ (rotleft(B, 24));
 	return C;
 }
 
 
-/* ÂÖº¯ÊıF 
+/* è½®å‡½æ•°F 
 *\param  x0~x3 <unsigned long>  
-*        rk <unsigned long>     ±¾ÂÖµÄÂÖÃÜÔ¿
-*\return <unsigned long>        ÂÖº¯Êı½á¹û
+*        rk <unsigned long>     æœ¬è½®çš„è½®å¯†é’¥
+*\return <unsigned long>        è½®å‡½æ•°ç»“æœ
 */
 unsigned long sm4F(unsigned long x0, unsigned long x1, unsigned long x2, unsigned long x3, unsigned long rk)
 {
 	return (x0 ^ sm4T(x1 ^ x2 ^ x3 ^ rk));
 }
 
-/* ÂÖÃÜÔ¿rkµÄ¼ÆËã£¨ÀàTÖÃ»»£¬ÆäÖĞL±ä»»²»Í¬£¬¿ÉÒÔ½ĞT'£©
-\param  in <unsigned long> T'ÖÃ»»µÄÊäÈë£ºËÄ¸ö32-bitµÄÒì»ò½á¹û
-\return rk <unsigned long> T'ÖÃ»»µÄÊä³ö£¬¼´Ä³ÂÖµÄÂÖÃÜÔ¿
+/* è½®å¯†é’¥rkçš„è®¡ç®—ï¼ˆç±»Tç½®æ¢ï¼Œå…¶ä¸­Lå˜æ¢ä¸åŒï¼Œå¯ä»¥å«T'ï¼‰
+\param  in <unsigned long> T'ç½®æ¢çš„è¾“å…¥ï¼šå››ä¸ª32-bitçš„å¼‚æˆ–ç»“æœ
+\return rk <unsigned long> T'ç½®æ¢çš„è¾“å‡ºï¼Œå³æŸè½®çš„è½®å¯†é’¥
 */
 unsigned long sm4Cal_rk(unsigned long in)
 {
@@ -142,15 +142,15 @@ unsigned long sm4Cal_rk(unsigned long in)
 	sout[1] = sm4Sbox(sin[1]);
 	sout[2] = sm4Sbox(sin[2]);
 	sout[3] = sm4Sbox(sin[3]);
-	unsigned long B, rk;//ÏßĞÔ±ä»»LµÄÊäÈëB¡¢Êä³öC
+	unsigned long B, rk;//çº¿æ€§å˜æ¢Lçš„è¾“å…¥Bã€è¾“å‡ºC
 	uchar_ulong(sout, &B);
 	rk = B ^ (rotleft(B, 13)) ^ (rotleft(B,23));
 	return rk;
 }
 
-/* ÃÜÔ¿À©Õ¹Ëã·¨
-\param  key <unsigned char[16]> 128-bitÖ÷ÃÜÔ¿
-        SK <unsigned long[32]> 32¸öÂÖÃÜÔ¿
+/* å¯†é’¥æ‰©å±•ç®—æ³•
+\param  key <unsigned char[16]> 128-bitä¸»å¯†é’¥
+        SK <unsigned long[32]> 32ä¸ªè½®å¯†é’¥
 */
 void sm4Setkey(unsigned char key[16], unsigned long SK[32])
 {
@@ -171,9 +171,9 @@ void sm4Setkey(unsigned char key[16], unsigned long SK[32])
 	}
 }
 
-/* ¼ÓÃÜµÄcontextÉèÖÃ£ºmodeÈ·¶¨ÊÇ¼ÓÃÜenc£¬ÂÖÃÜÔ¿µ÷ÓÃÃÜÔ¿À©Õ¹Ëã·¨Éú³É
-*\param  ctx <sm4Context*>       Ò»´Îsm4µÄÉÏÏÂÎÄ
-*        key <unsigned char[16]> Õâ´ÎµÄÖ÷ÃÜÔ¿
+/* åŠ å¯†çš„contextè®¾ç½®ï¼šmodeç¡®å®šæ˜¯åŠ å¯†encï¼Œè½®å¯†é’¥è°ƒç”¨å¯†é’¥æ‰©å±•ç®—æ³•ç”Ÿæˆ
+*\param  ctx <sm4Context*>       ä¸€æ¬¡sm4çš„ä¸Šä¸‹æ–‡
+*        key <unsigned char[16]> è¿™æ¬¡çš„ä¸»å¯†é’¥
 */
 void sm4Setkey_Enc(sm4Context* ctx,unsigned char key[16])
 {
@@ -181,9 +181,9 @@ void sm4Setkey_Enc(sm4Context* ctx,unsigned char key[16])
 	sm4Setkey(key, ctx->sk);
 }
 
-/* ½âÃÜµÄcontextÉèÖÃ£ºmodeÈ·¶¨ÊÇ½âÃÜdec£¬ÂÖÃÜÔ¿µ÷ÓÃÃÜÔ¿À©Õ¹Ëã·¨Éú³É
-*\param  ctx <sm4Context*>       Ò»´Îsm4µÄÉÏÏÂÎÄ
-*        key <unsigned char[16]> Õâ´ÎµÄÖ÷ÃÜÔ¿
+/* è§£å¯†çš„contextè®¾ç½®ï¼šmodeç¡®å®šæ˜¯è§£å¯†decï¼Œè½®å¯†é’¥è°ƒç”¨å¯†é’¥æ‰©å±•ç®—æ³•ç”Ÿæˆ
+*\param  ctx <sm4Context*>       ä¸€æ¬¡sm4çš„ä¸Šä¸‹æ–‡
+*        key <unsigned char[16]> è¿™æ¬¡çš„ä¸»å¯†é’¥
 */
 void sm4Setkey_Dec(sm4Context* ctx, unsigned char key[16])
 {
@@ -196,10 +196,10 @@ void sm4Setkey_Dec(sm4Context* ctx, unsigned char key[16])
 }
 
 
-/* Ò»ÂÖsm4
-*\param  SK   32¸öÂÖÃÜÔ¿
-*        plain Ã÷ÎÄ
-*        cipher ÃÜÎÄ
+/* ä¸€è½®sm4
+*\param  SK   32ä¸ªè½®å¯†é’¥
+*        plain æ˜æ–‡
+*        cipher å¯†æ–‡
 */
 void sm4_1_Round(unsigned long SK[32],unsigned char plain[16],unsigned char cipher[16])
 {
@@ -221,11 +221,11 @@ void sm4_1_Round(unsigned long SK[32],unsigned char plain[16],unsigned char ciph
 	ulong_uchar(bigX[32], cipher+12);
 }
 
-/* ecbÄ£Ê½ 
- *\param  SK      32¸öÂÖÃÜÔ¿
- *        input   ÊäÈë
- *        output  Êä³ö
- *        length  ³¤¶È
+/* ecbæ¨¡å¼ 
+ *\param  SK      32ä¸ªè½®å¯†é’¥
+ *        input   è¾“å…¥
+ *        output  è¾“å‡º
+ *        length  é•¿åº¦
  */
 void sm4_ecb(unsigned long SK[32], unsigned char* input, unsigned char* output,unsigned long length)
 {
@@ -238,7 +238,7 @@ void sm4_ecb(unsigned long SK[32], unsigned char* input, unsigned char* output,u
 	}
 }
 
-/* Ñ­»·Õ¹¿ª ÄÚ²¿2´Î µÄecb */
+/* å¾ªç¯å±•å¼€ å†…éƒ¨2æ¬¡ çš„ecb */
 void sm4_ecb_LoopUnRoll2(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
 {
 	int i = 0;
@@ -259,7 +259,7 @@ void sm4_ecb_LoopUnRoll2(unsigned long SK[32], unsigned char* input, unsigned ch
 	}
 }
 
-/* Ñ­»·Õ¹¿ª ÄÚ²¿4´Î µÄecb */
+/* å¾ªç¯å±•å¼€ å†…éƒ¨4æ¬¡ çš„ecb */
 void sm4_ecb_LoopUnRoll4(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
 {
 	int i = 0;
@@ -282,7 +282,7 @@ void sm4_ecb_LoopUnRoll4(unsigned long SK[32], unsigned char* input, unsigned ch
 	}
 }
 
-/* Ñ­»·Õ¹¿ª ÄÚ²¿8´Î µÄecb */
+/* å¾ªç¯å±•å¼€ å†…éƒ¨8æ¬¡ çš„ecb */
 void sm4_ecb_LoopUnRoll8(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
 {
 	int i = 0;
@@ -309,7 +309,7 @@ void sm4_ecb_LoopUnRoll8(unsigned long SK[32], unsigned char* input, unsigned ch
 	}
 }
 
-/* Ñ­»·Õ¹¿ª ÄÚ²¿8´Î µÄecb */
+/* å¾ªç¯å±•å¼€ å†…éƒ¨8æ¬¡ çš„ecb */
 void sm4_ecb_LoopUnRoll16(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
 {
 	int i = 0;
@@ -345,7 +345,7 @@ void sm4_ecb_LoopUnRoll16(unsigned long SK[32], unsigned char* input, unsigned c
 }
 
 
-/* Õ¹Ê¾µÄº¯Êı */
+/* å±•ç¤ºçš„å‡½æ•° */
 void shower(unsigned char* show, unsigned long len)
 {
 	for (int i = 0; i < len; i++)
@@ -365,7 +365,7 @@ void shower(unsigned char* show, unsigned long len)
 	cout << endl;
 }
 
-/* ³õÊ¼»¯Êı×é */
+/* åˆå§‹åŒ–æ•°ç»„ */
 void init(unsigned char* arr, int len)
 {
 	int i = 0;
@@ -380,9 +380,9 @@ void init(unsigned char* arr, int len)
 }
 
 
-/* ÎŞ·ûºÅcharÊı×é×ªÎŞ·ûºÅlongĞÍ simd°æ±¾ Ò»´Î×ö128bit
-* \param  in <unsigned char*>  ÎŞ·ûºÅcharÊı×é
-*         out <unsigned long*> ÎŞ·ûºÅlong
+/* æ— ç¬¦å·charæ•°ç»„è½¬æ— ç¬¦å·longå‹ simdç‰ˆæœ¬ ä¸€æ¬¡åš128bit
+* \param  in <unsigned char*>  æ— ç¬¦å·charæ•°ç»„
+*         out <unsigned long*> æ— ç¬¦å·long
 */
 void u8_u32_SIMD(unsigned char* u8, unsigned long* u32)
 {
@@ -393,9 +393,9 @@ void u8_u32_SIMD(unsigned char* u8, unsigned long* u32)
 	_mm_storeu_epi32(u32, c);
 }
 
-/* ÎŞ·ûºÅlong×ªÎŞ·ûºÅcharÊı×é simd°æ±¾ Ò»´Î×ö128bit ²¢ÇÒµ¹ÖÃ
-* \param  in <unsigned long>   ÎŞ·ûºÅlong
-*         out <unsigned char*> ÎŞ·ûºÅcharÊı×é
+/* æ— ç¬¦å·longè½¬æ— ç¬¦å·charæ•°ç»„ simdç‰ˆæœ¬ ä¸€æ¬¡åš128bit å¹¶ä¸”å€’ç½®
+* \param  in <unsigned long>   æ— ç¬¦å·long
+*         out <unsigned char*> æ— ç¬¦å·charæ•°ç»„
 */
 void u32_u8_SIMD(unsigned char* u8, unsigned long* u32)
 {
@@ -406,29 +406,9 @@ void u32_u8_SIMD(unsigned char* u8, unsigned long* u32)
 	_mm_storeu_epi8(u8, c);
 }
 
-/* ÃÜÔ¿À©Õ¹Ëã·¨ simd
-\param  key <unsigned char[16]> 128-bitÖ÷ÃÜÔ¿
-		SK <unsigned long[32]> 32¸öÂÖÃÜÔ¿
-*/
-void sm4Setkey_SIMD(unsigned char key[16], unsigned long SK[32])
-{
-	unsigned long mainKey[4];
-	unsigned long k[36];
-	u8_u32_SIMD(key,mainKey);
-	k[0] = mainKey[0] ^ FK[0];
-	k[1] = mainKey[1] ^ FK[1];
-	k[2] = mainKey[2] ^ FK[2];
-	k[3] = mainKey[3] ^ FK[3];
-	for (int i = 0; i < 32; i++)
-	{
-		k[i + 4] = k[i] ^ (sm4Cal_rk(k[i + 1] ^ k[i + 2] ^ k[i + 3] ^ CK[i]));
-		SK[i] = k[i + 4];
-	}
-}
-
-/* ¼ÓÃÜµÄcontextÉèÖÃ£ºmodeÈ·¶¨ÊÇ¼ÓÃÜenc£¬ÂÖÃÜÔ¿µ÷ÓÃÃÜÔ¿À©Õ¹Ëã·¨Éú³É  simd
-*\param  ctx <sm4Context*>       Ò»´Îsm4µÄÉÏÏÂÎÄ
-*        key <unsigned char[16]> Õâ´ÎµÄÖ÷ÃÜÔ¿
+/* åŠ å¯†çš„contextè®¾ç½®ï¼šmodeç¡®å®šæ˜¯åŠ å¯†encï¼Œè½®å¯†é’¥è°ƒç”¨å¯†é’¥æ‰©å±•ç®—æ³•ç”Ÿæˆ  simd
+*\param  ctx <sm4Context*>       ä¸€æ¬¡sm4çš„ä¸Šä¸‹æ–‡
+*        key <unsigned char[16]> è¿™æ¬¡çš„ä¸»å¯†é’¥
 */
 void sm4Setkey_Enc_SIMD(sm4Context* ctx, unsigned char key[16])
 {
@@ -437,9 +417,9 @@ void sm4Setkey_Enc_SIMD(sm4Context* ctx, unsigned char key[16])
 }
 
 
-/* ½âÃÜµÄcontextÉèÖÃ£ºmodeÈ·¶¨ÊÇ½âÃÜdec£¬ÂÖÃÜÔ¿µ÷ÓÃÃÜÔ¿À©Õ¹Ëã·¨Éú³É  simd
-*\param  ctx <sm4Context*>       Ò»´Îsm4µÄÉÏÏÂÎÄ
-*        key <unsigned char[16]> Õâ´ÎµÄÖ÷ÃÜÔ¿
+/* è§£å¯†çš„contextè®¾ç½®ï¼šmodeç¡®å®šæ˜¯è§£å¯†decï¼Œè½®å¯†é’¥è°ƒç”¨å¯†é’¥æ‰©å±•ç®—æ³•ç”Ÿæˆ  simd
+*\param  ctx <sm4Context*>       ä¸€æ¬¡sm4çš„ä¸Šä¸‹æ–‡
+*        key <unsigned char[16]> è¿™æ¬¡çš„ä¸»å¯†é’¥
 */
 void sm4Setkey_Dec_SIMD(sm4Context* ctx, unsigned char key[16])
 {
@@ -451,39 +431,3 @@ void sm4Setkey_Dec_SIMD(sm4Context* ctx, unsigned char key[16])
 	}
 }
 
-/* Ò»ÂÖsm4 simd
-*\param  SK   32¸öÂÖÃÜÔ¿
-*        plain Ã÷ÎÄ
-*        cipher ÃÜÎÄ
-*/
-void sm4_1_Round_SIMD(unsigned long SK[32], unsigned char plain[16], unsigned char cipher[16])
-{
-	unsigned long bigX[36];
-	u8_u32_SIMD(plain, bigX);
-	for (int i = 0; i < 32; i++)
-	{
-		bigX[i + 4] = sm4F(bigX[i], bigX[i + 1], bigX[i + 2], bigX[i + 3], SK[i]);
-		//cout << "rk" << i << "=";
-		//cout << hex << SK[i] << "    X" << i << "=";
-		//cout << hex << bigX[i + 4] << endl;
-	}
-	u32_u8_SIMD(cipher,bigX+32);
-}
-
-
-/* ecbÄ£Ê½   simd
- *\param  SK      32¸öÂÖÃÜÔ¿
- *        input   ÊäÈë
- *        output  Êä³ö
- *        length  ³¤¶È
- */
-void sm4_ecb_SIMD(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
-{
-	while (length > 0)
-	{
-		sm4_1_Round_SIMD(SK, input, output);
-		length -= 16;
-		input += 16;
-		output += 16;
-	}
-}
