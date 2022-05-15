@@ -23,8 +23,8 @@ unsigned char cipher16[N];
 unsigned char plainFromDec16[N];
 int main()
 {
-	cout << "¼ÓÃÜ´ÎÊý£º" << M << endl;
-	cout << "=========Æ½·²SM4========\n";
+	cout << "åŠ å¯†æ¬¡æ•°ï¼š" << M << endl;
+	cout << "=========å¹³å‡¡SM4========\n";
 	unsigned char key[16] = { 0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10 };
 	unsigned char plain[16] = { 0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10 };
 	unsigned char cipher[16];
@@ -37,7 +37,7 @@ int main()
 	init(plain4, N);
 	init(plain8, N);
 	init(plain16, N);
-	/* 1.¼ÓÃÜ²âÊÔ */
+	/* 1.åŠ å¯†æµ‹è¯• */
 	sm4Setkey_Enc(&ctx, key);
 	start = clock();
 	for (int I = 0; I < M; I++)
@@ -45,10 +45,10 @@ int main()
 		sm4_1_Round(ctx.sk, plain, cipher);
 	}
 	end = clock();
-	cout << "Æ½·²Ñ­»·µÄ¼ÓÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "å¹³å‡¡å¾ªçŽ¯çš„åŠ å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 	//shower(cipher, 16);
 
-	/* 2.½âÃÜ²âÊÔ */
+	/* 2.è§£å¯†æµ‹è¯• */
 	sm4Setkey_Dec(&ctx, key);
 	start = clock();
 	for (int I = 0; I < M; I++)
@@ -56,122 +56,77 @@ int main()
 		sm4_1_Round(ctx.sk, cipher, plainFromDec);
 	}
 	end = clock();
-	cout << "Æ½·²Ñ­»·µÄ½âÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "å¹³å‡¡å¾ªçŽ¯çš„è§£å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 	//shower(plainFromDec, 16);
 
 
 
 
-	/* 3.ecbÄ£Ê½²âÊÔ */
+	/* 3.ecbæ¨¡å¼æµ‹è¯• */
 	sm4Setkey_Enc(&ctx2, key);
 	start = clock();
 	sm4_ecb(ctx2.sk, plain1, cipher1, N);
 	end = clock();
-	cout << "ecbµÄ¼ÓÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbçš„åŠ å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 
 	sm4Setkey_Dec(&ctx2, key);
 	start = clock();
 	sm4_ecb(ctx2.sk, cipher1, plainFromDec1, N);
 	end = clock();
-	cout << "ecbµÄ½âÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbçš„è§£å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 	//shower(cipher2, len);
 	//shower(plainFromDec2, len);
 
-	/* 4.unroll2²âÊÔ */
+	/* 4.unroll2æµ‹è¯• */
 	sm4Setkey_Enc(&ctx2, key);
 	start = clock();
 	sm4_ecb_LoopUnRoll2(ctx2.sk, plain2, cipher2, N);
 	end = clock();
-	cout << "ecbÑ­»·Õ¹¿ª2´ÎµÄ¼ÓÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbå¾ªçŽ¯å±•å¼€2æ¬¡çš„åŠ å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 
 	sm4Setkey_Dec(&ctx2, key);
 	start = clock();
 	sm4_ecb_LoopUnRoll2(ctx2.sk, cipher2, plainFromDec2, N);
 	end = clock();
-	cout << "ecbÑ­»·Õ¹¿ª2´ÎµÄ½âÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbå¾ªçŽ¯å±•å¼€2æ¬¡çš„è§£å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 
 
-	/* 5.unroll4²âÊÔ */
+	/* 5.unroll4æµ‹è¯• */
 	sm4Setkey_Enc(&ctx2, key);
 	start = clock();
 	sm4_ecb_LoopUnRoll4(ctx2.sk, plain4, cipher4, N);
 	end = clock();
-	cout << "ecbÑ­»·Õ¹¿ª4´ÎµÄ¼ÓÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbå¾ªçŽ¯å±•å¼€4æ¬¡çš„åŠ å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 
 	sm4Setkey_Dec(&ctx2, key);
 	start = clock();
 	sm4_ecb_LoopUnRoll4(ctx2.sk, cipher4, plainFromDec4, N);
 	end = clock();
-	cout << "ecbÑ­»·Õ¹¿ª4´ÎµÄ½âÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbå¾ªçŽ¯å±•å¼€4æ¬¡çš„è§£å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 
 
-	/* 6.unroll8²âÊÔ */
+	/* 6.unroll8æµ‹è¯• */
 	sm4Setkey_Enc(&ctx2, key);
 	start = clock();
 	sm4_ecb_LoopUnRoll8(ctx2.sk, plain8, cipher8, N);
 	end = clock();
-	cout << "ecbÑ­»·Õ¹¿ª8´ÎµÄ¼ÓÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbå¾ªçŽ¯å±•å¼€8æ¬¡çš„åŠ å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 
 	sm4Setkey_Dec(&ctx2, key);
 	start = clock();
 	sm4_ecb_LoopUnRoll8(ctx2.sk, cipher8, plainFromDec8, N);
 	end = clock();
-	cout << "ecbÑ­»·Õ¹¿ª8´ÎµÄ½âÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbå¾ªçŽ¯å±•å¼€8æ¬¡çš„è§£å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 
-	/* 7.unroll16²âÊÔ */
+	/* 7.unroll16æµ‹è¯• */
 	sm4Setkey_Enc(&ctx2, key);
 	start = clock();
 	sm4_ecb_LoopUnRoll16(ctx2.sk, plain16, cipher16, N);
 	end = clock();
-	cout << "ecbÑ­»·Õ¹¿ª16´ÎµÄ¼ÓÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
+	cout << "ecbå¾ªçŽ¯å±•å¼€16æ¬¡çš„åŠ å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
 
 	sm4Setkey_Dec(&ctx2, key);
 	start = clock();
 	sm4_ecb_LoopUnRoll16(ctx2.sk, cipher16, plainFromDec16, N);
 	end = clock();
-	cout << "ecbÑ­»·Õ¹¿ª16´ÎµÄ½âÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-
-
-
-
-	cout << "\n========SIMD========\n";
-	/* 8.¼ÓÃÜ²âÊÔ SIMD */
-	sm4Setkey_Enc(&ctx, key);
-	start = clock();
-	for (int I = 0; I < M; I++)
-	{
-		sm4_1_Round_SIMD(ctx.sk, plain, cipher);
-	}
-	end = clock();
-	cout << "Æ½·²Ñ­»·µÄ¼ÓÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-	//shower(cipher, 16);
-
-	/* 9.½âÃÜ²âÊÔ SIMD */
-	sm4Setkey_Dec(&ctx, key);
-	start = clock();
-	for (int I = 0; I < M; I++)
-	{
-		sm4_1_Round_SIMD(ctx.sk, cipher, plainFromDec);
-	}
-	end = clock();
-	cout << "Æ½·²Ñ­»·µÄ½âÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-	//shower(plainFromDec, 16);
-
-
-	/* 10.ecbÄ£Ê½²âÊÔ */
-	sm4Setkey_Enc_SIMD(&ctx2, key);
-	start = clock();
-	sm4_ecb_SIMD(ctx2.sk, plain1, cipher1, N);
-	end = clock();
-	cout << "ecbµÄ¼ÓÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-
-	sm4Setkey_Dec_SIMD(&ctx2, key);
-	start = clock();
-	sm4_ecb_SIMD(ctx2.sk, cipher1, plainFromDec1, N);
-	end = clock();
-	cout << "ecbµÄ½âÃÜ " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-	//shower(cipher2, len);
-	//shower(plainFromDec2, len);
-
-	return 0;
-}
+	cout << "ecbå¾ªçŽ¯å±•å¼€16æ¬¡çš„è§£å¯† " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
