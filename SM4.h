@@ -1,95 +1,53 @@
 #pragma once
 
 
-#define SM4_ENCRYPT 1//¼ÓÃÜ±êÖ¾
-#define SM4_DECRYPT 0//½âÃÜ±êÖ¾
+#define SM4_ENCRYPT 1//åŠ å¯†æ ‡å¿—
+#define SM4_DECRYPT 0//è§£å¯†æ ‡å¿—
 
 struct sm4Context
 {
-	int mode;//Ñ¡Ôñ¼ÓÃÜ/½âÃÜmode
-	unsigned long sk[32];//subkey:32¸öÂÖÃÜÔ¿
+	int mode;//é€‰æ‹©åŠ å¯†/è§£å¯†mode
+	unsigned long sk[32];//subkey:32ä¸ªè½®å¯†é’¥
 };
 
 
 
-/* ¼ÓÃÜµÄcontextÉèÖÃ£ºmodeÈ·¶¨ÊÇ¼ÓÃÜenc£¬ÂÖÃÜÔ¿µ÷ÓÃÃÜÔ¿À©Õ¹Ëã·¨Éú³É
-*\param  ctx <sm4Context*>             Ò»´Îsm4µÄÉÏÏÂÎÄ
-*        key <unsigned char[16]>       Õâ´ÎµÄÖ÷ÃÜÔ¿
+/* åŠ å¯†çš„contextè®¾ç½®ï¼šmodeç¡®å®šæ˜¯åŠ å¯†encï¼Œè½®å¯†é’¥è°ƒç”¨å¯†é’¥æ‰©å±•ç®—æ³•ç”Ÿæˆ
+*\param  ctx <sm4Context*>             ä¸€æ¬¡sm4çš„ä¸Šä¸‹æ–‡
+*        key <unsigned char[16]>       è¿™æ¬¡çš„ä¸»å¯†é’¥
 */
 void sm4Setkey_Enc(sm4Context* ctx, unsigned char key[16]);
 
 
 
-/* ½âÃÜµÄcontextÉèÖÃ£ºmodeÈ·¶¨ÊÇ½âÃÜdec£¬ÂÖÃÜÔ¿µ÷ÓÃÃÜÔ¿À©Õ¹Ëã·¨Éú³É
-*\param  ctx <sm4Context*>            Ò»´Îsm4µÄÉÏÏÂÎÄ
-*        key <unsigned char[16]>      Õâ´ÎµÄÖ÷ÃÜÔ¿
+/* è§£å¯†çš„contextè®¾ç½®ï¼šmodeç¡®å®šæ˜¯è§£å¯†decï¼Œè½®å¯†é’¥è°ƒç”¨å¯†é’¥æ‰©å±•ç®—æ³•ç”Ÿæˆ
+*\param  ctx <sm4Context*>            ä¸€æ¬¡sm4çš„ä¸Šä¸‹æ–‡
+*        key <unsigned char[16]>      è¿™æ¬¡çš„ä¸»å¯†é’¥
 */
 void sm4Setkey_Dec(sm4Context* ctx, unsigned char key[16]);
 
 
 
-/* Ò»ÂÖsm4
-*\param  SK                           32¸öÂÖÃÜÔ¿
-*        plain                        Ã÷ÎÄ
-*        cipher                       ÃÜÎÄ
+/* ä¸€è½®sm4
+*\param  SK                           32ä¸ªè½®å¯†é’¥
+*        plain                        æ˜æ–‡
+*        cipher                       å¯†æ–‡
 */
 void sm4_1_Round(unsigned long SK[32], unsigned char plain[16], unsigned char cipher[16]);
 
 
-/* ecbÄ£Ê½
- *\param  SK      32¸öÂÖÃÜÔ¿
- *        input   ÊäÈë
- *        output  Êä³ö
- *        length  ³¤¶È
+/* ecbæ¨¡å¼
+ *\param  SK      32ä¸ªè½®å¯†é’¥
+ *        input   è¾“å…¥
+ *        output  è¾“å‡º
+ *        length  é•¿åº¦
  */
 void sm4_ecb(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length);
 
 
-/* Ñ­»·Õ¹¿ª ÄÚ²¿2´Î µÄecb */
-void sm4_ecb_LoopUnRoll2(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length);
-
-/* Ñ­»·Õ¹¿ª ÄÚ²¿4´Î µÄecb */
-void sm4_ecb_LoopUnRoll4(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length);
-
-/* Ñ­»·Õ¹¿ª ÄÚ²¿8´Î µÄecb */
-void sm4_ecb_LoopUnRoll8(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length);
-
-/* Ñ­»·Õ¹¿ª ÄÚ²¿16´Î µÄecb */
-void sm4_ecb_LoopUnRoll16(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length);
-
-
-/* Õ¹Ê¾µÄº¯Êı */
+/* å±•ç¤ºçš„å‡½æ•° */
 void shower(unsigned char* show, unsigned long len);
 
 
-/* ³õÊ¼»¯Êı×é */
+/* åˆå§‹åŒ–æ•°ç»„ */
 void init(unsigned char* arr, int len);
-
-
-/* ¼ÓÃÜµÄcontextÉèÖÃ£ºmodeÈ·¶¨ÊÇ¼ÓÃÜenc£¬ÂÖÃÜÔ¿µ÷ÓÃÃÜÔ¿À©Õ¹Ëã·¨Éú³É  simd
-*\param  ctx <sm4Context*>       Ò»´Îsm4µÄÉÏÏÂÎÄ
-*        key <unsigned char[16]> Õâ´ÎµÄÖ÷ÃÜÔ¿
-*/
-void sm4Setkey_Enc_SIMD(sm4Context* ctx, unsigned char key[16]);
-
-
-/* ½âÃÜµÄcontextÉèÖÃ£ºmodeÈ·¶¨ÊÇ½âÃÜdec£¬ÂÖÃÜÔ¿µ÷ÓÃÃÜÔ¿À©Õ¹Ëã·¨Éú³É  simd
-*\param  ctx <sm4Context*>       Ò»´Îsm4µÄÉÏÏÂÎÄ
-*        key <unsigned char[16]> Õâ´ÎµÄÖ÷ÃÜÔ¿
-*/
-void sm4Setkey_Dec_SIMD(sm4Context* ctx, unsigned char key[16]);
-
-/* Ò»ÂÖsm4 simd
-*\param  SK   32¸öÂÖÃÜÔ¿
-*        plain Ã÷ÎÄ
-*        cipher ÃÜÎÄ
-*/
-void sm4_1_Round_SIMD(unsigned long SK[32], unsigned char plain[16], unsigned char cipher[16]);
-
-/* ecbÄ£Ê½   simd
- *\param  SK      32¸öÂÖÃÜÔ¿
- *        input   ÊäÈë
- *        output  Êä³ö
- *        length  ³¤¶È
- */
-void sm4_ecb_SIMD(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length);
