@@ -5,7 +5,9 @@
 using namespace std;
 
 /* 用于初始化的0~ff~0 */
-static const unsigned char initial[16] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10 };
+static const unsigned char initial[16] = 
+{ 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 
+ 0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10 };
 
 /* S盒 */
 static const unsigned char SboxTable[16][16] =
@@ -66,10 +68,7 @@ void uchar_ulong(unsigned char* in, unsigned long* out)
 		*out = ((unsigned long)in[i] << (24 - i * 8)) ^ *out;
 }
 
-/* 无符号long转无符号char数组
-* \param  in <unsigned long>   无符号long
-*         out <unsigned char*> 无符号char数组
-*/
+/* 无符号long转无符号char数组*/
 void ulong_uchar(unsigned long in, unsigned char* out)
 {
 	int i = 0;
@@ -77,20 +76,13 @@ void ulong_uchar(unsigned long in, unsigned char* out)
 		*(out + i) = (unsigned long)(in >> (24 - i * 8));
 }
 
-/* 循环左移
-*\param  x <unsigned long>  需要循环左移的数
-*        n <int>            左移位数
-*\return 循环左移的结果  
-*/
+/* 循环左移*/
 unsigned long rotleft(unsigned long x, int n)
 {
 	return ((x & 0xFFFFFFFF) << n) | (x >> (32 - n));
 }
 
-/* 交换：在设置解密密钥的时候用到
-*\param  a  交换1
-*        b  交换2
-*/
+/* 交换：在设置解密密钥的时候用到*/
 void swap(unsigned long* a, unsigned long* b)
 {
 	unsigned long tmp;
@@ -99,10 +91,7 @@ void swap(unsigned long* a, unsigned long* b)
 	*b = tmp;
 }
 
-/* 合成置换T 
-*\param  in <unsigned long> T置换的输入：四个32-bit的异或结果
-*\return C <unsigned long> T置换的输出
-*/
+/* 合成置换T */
 unsigned long sm4T(unsigned long in)
 {
 	unsigned char sin[4];
@@ -119,20 +108,13 @@ unsigned long sm4T(unsigned long in)
 }
 
 
-/* 轮函数F 
-*\param  x0~x3 <unsigned long>  
-*        rk <unsigned long>     本轮的轮密钥
-*\return <unsigned long>        轮函数结果
-*/
+/* 轮函数F */
 unsigned long sm4F(unsigned long x0, unsigned long x1, unsigned long x2, unsigned long x3, unsigned long rk)
 {
 	return (x0 ^ sm4T(x1 ^ x2 ^ x3 ^ rk));
 }
 
-/* 轮密钥rk的计算（类T置换，其中L变换不同，可以叫T'）
-\param  in <unsigned long> T'置换的输入：四个32-bit的异或结果
-\return rk <unsigned long> T'置换的输出，即某轮的轮密钥
-*/
+/* 轮密钥rk的计算*/
 unsigned long sm4Cal_rk(unsigned long in)
 {
 	unsigned char sin[4];
@@ -148,10 +130,7 @@ unsigned long sm4Cal_rk(unsigned long in)
 	return rk;
 }
 
-/* 密钥扩展算法
-\param  key <unsigned char[16]> 128-bit主密钥
-        SK <unsigned long[32]> 32个轮密钥
-*/
+/* 密钥扩展算法*/
 void sm4Setkey(unsigned char key[16], unsigned long SK[32])
 {
 	unsigned long mainKey[4];
@@ -171,20 +150,14 @@ void sm4Setkey(unsigned char key[16], unsigned long SK[32])
 	}
 }
 
-/* 加密的context设置：mode确定是加密enc，轮密钥调用密钥扩展算法生成
-*\param  ctx <sm4Context*>       一次sm4的上下文
-*        key <unsigned char[16]> 这次的主密钥
-*/
+/* 加密的context设置：mode确定是加密enc，轮密钥调用密钥扩展算法生成*/
 void sm4Setkey_Enc(sm4Context* ctx,unsigned char key[16])
 {
 	ctx->mode = SM4_ENCRYPT;
 	sm4Setkey(key, ctx->sk);
 }
 
-/* 解密的context设置：mode确定是解密dec，轮密钥调用密钥扩展算法生成
-*\param  ctx <sm4Context*>       一次sm4的上下文
-*        key <unsigned char[16]> 这次的主密钥
-*/
+/* 解密的context设置：mode确定是解密dec，轮密钥调用密钥扩展算法生成*/
 void sm4Setkey_Dec(sm4Context* ctx, unsigned char key[16])
 {
 	ctx->mode = SM4_DECRYPT;
@@ -196,11 +169,7 @@ void sm4Setkey_Dec(sm4Context* ctx, unsigned char key[16])
 }
 
 
-/* 一轮sm4
-*\param  SK   32个轮密钥
-*        plain 明文
-*        cipher 密文
-*/
+/* 一轮sm4*/
 void sm4_1_Round(unsigned long SK[32],unsigned char plain[16],unsigned char cipher[16])
 {
 	unsigned long bigX[36];
@@ -221,12 +190,7 @@ void sm4_1_Round(unsigned long SK[32],unsigned char plain[16],unsigned char ciph
 	ulong_uchar(bigX[32], cipher+12);
 }
 
-/* ecb模式 
- *\param  SK      32个轮密钥
- *        input   输入
- *        output  输出
- *        length  长度
- */
+/* ecb模式 */
 void sm4_ecb(unsigned long SK[32], unsigned char* input, unsigned char* output,unsigned long length)
 {
 	while (length > 0)
@@ -237,113 +201,6 @@ void sm4_ecb(unsigned long SK[32], unsigned char* input, unsigned char* output,u
 		output += 16;
 	}
 }
-
-/* 循环展开 内部2次 的ecb */
-void sm4_ecb_LoopUnRoll2(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
-{
-	int i = 0;
-	while (i<length-32)
-	{
-		sm4_1_Round(SK, input, output);
-		sm4_1_Round(SK, input + 16, output + 16);
-		input += 32;
-		output += 32;
-		i += 32;
-	}
-	while (i < length)
-	{
-		sm4_1_Round(SK, input, output);
-		input += 16;
-		output += 16;
-		i += 16;
-	}
-}
-
-/* 循环展开 内部4次 的ecb */
-void sm4_ecb_LoopUnRoll4(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
-{
-	int i = 0;
-	while (i < length - 64)
-	{
-		sm4_1_Round(SK, input, output);
-		sm4_1_Round(SK, input + 16, output + 16);
-		sm4_1_Round(SK, input + 32, output + 32);
-		sm4_1_Round(SK, input + 48, output + 48);
-		input += 64;
-		output += 64;
-		i += 64;
-	}
-	while (i < length)
-	{
-		sm4_1_Round(SK, input, output);
-		input += 16;
-		output += 16;
-		i += 16;
-	}
-}
-
-/* 循环展开 内部8次 的ecb */
-void sm4_ecb_LoopUnRoll8(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
-{
-	int i = 0;
-	while (i < length - 128)
-	{
-		sm4_1_Round(SK, input, output);
-		sm4_1_Round(SK, input + 16, output + 16);
-		sm4_1_Round(SK, input + 32, output + 32);
-		sm4_1_Round(SK, input + 48, output + 48);
-		sm4_1_Round(SK, input + 64, output + 64);
-		sm4_1_Round(SK, input + 80, output + 80);
-		sm4_1_Round(SK, input + 96, output + 96);
-		sm4_1_Round(SK, input + 112, output + 112);
-		input += 128;
-		output += 128;
-		i += 128;
-	}
-	while (i < length)
-	{
-		sm4_1_Round(SK, input, output);
-		input += 16;
-		output += 16;
-		i += 16;
-	}
-}
-
-/* 循环展开 内部8次 的ecb */
-void sm4_ecb_LoopUnRoll16(unsigned long SK[32], unsigned char* input, unsigned char* output, unsigned long length)
-{
-	int i = 0;
-	while (i < length - 256)
-	{
-		sm4_1_Round(SK, input, output);
-		sm4_1_Round(SK, input + 16, output + 16);
-		sm4_1_Round(SK, input + 32, output + 32);
-		sm4_1_Round(SK, input + 48, output + 48);
-		sm4_1_Round(SK, input + 64, output + 64);
-		sm4_1_Round(SK, input + 80, output + 80);
-		sm4_1_Round(SK, input + 96, output + 96);
-		sm4_1_Round(SK, input + 112, output + 112);
-		sm4_1_Round(SK, input + 128, output + 128);
-		sm4_1_Round(SK, input + 144, output + 144);
-		sm4_1_Round(SK, input + 160, output + 160);
-		sm4_1_Round(SK, input + 176, output +176);
-		sm4_1_Round(SK, input + 192, output + 192);
-		sm4_1_Round(SK, input + 208, output + 208);
-		sm4_1_Round(SK, input + 224, output + 224);
-		sm4_1_Round(SK, input + 240, output + 240);
-		input += 256;
-		output += 256;
-		i += 256;
-	}
-	while (i < length)
-	{
-		sm4_1_Round(SK, input, output);
-		input += 16;
-		output += 16;
-		i += 16;
-	}
-}
-
 
 /* 展示的函数 */
 void shower(unsigned char* show, unsigned long len)
@@ -378,56 +235,3 @@ void init(unsigned char* arr, int len)
 		}
 	}
 }
-
-
-/* 无符号char数组转无符号long型 simd版本 一次做128bit
-* \param  in <unsigned char*>  无符号char数组
-*         out <unsigned long*> 无符号long
-*/
-void u8_u32_SIMD(unsigned char* u8, unsigned long* u32)
-{
-	__m128i a, b, c;
-	b = _mm_setr_epi8(3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12);
-	a = _mm_setr_epi8(u8[0], u8[1], u8[2], u8[3], u8[4], u8[5], u8[6], u8[7], u8[8], u8[9], u8[10], u8[11], u8[12], u8[13], u8[14], u8[15]);
-	c = _mm_shuffle_epi8(a, b);
-	_mm_storeu_epi32(u32, c);
-}
-
-/* 无符号long转无符号char数组 simd版本 一次做128bit 并且倒置
-* \param  in <unsigned long>   无符号long
-*         out <unsigned char*> 无符号char数组
-*/
-void u32_u8_SIMD(unsigned char* u8, unsigned long* u32)
-{
-	__m128i a, b, c;
-	a = _mm_set_epi32(u32[0], u32[1], u32[2], u32[3]);
-	b = _mm_setr_epi8(3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12);
-	c = _mm_shuffle_epi8(a, b);
-	_mm_storeu_epi8(u8, c);
-}
-
-/* 加密的context设置：mode确定是加密enc，轮密钥调用密钥扩展算法生成  simd
-*\param  ctx <sm4Context*>       一次sm4的上下文
-*        key <unsigned char[16]> 这次的主密钥
-*/
-void sm4Setkey_Enc_SIMD(sm4Context* ctx, unsigned char key[16])
-{
-	ctx->mode = SM4_ENCRYPT;
-	sm4Setkey_SIMD(key, ctx->sk);
-}
-
-
-/* 解密的context设置：mode确定是解密dec，轮密钥调用密钥扩展算法生成  simd
-*\param  ctx <sm4Context*>       一次sm4的上下文
-*        key <unsigned char[16]> 这次的主密钥
-*/
-void sm4Setkey_Dec_SIMD(sm4Context* ctx, unsigned char key[16])
-{
-	ctx->mode = SM4_DECRYPT;
-	sm4Setkey_SIMD(key, ctx->sk);
-	for (int i = 0; i < 16; i++)
-	{
-		swap(&(ctx->sk[i]), &(ctx->sk[31 - i]));
-	}
-}
-
