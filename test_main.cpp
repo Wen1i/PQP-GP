@@ -1,78 +1,30 @@
-#include "sm4.h"
 #include <string.h>
-#include<iostream>
-#include<time.h>
-using namespace std;
-const int M = 10000000;
-const int N = 16 * M;
-const int len = 128;
-unsigned char plain1[N];
-unsigned char cipher1[N];
-unsigned char plainFromDec1[N];
-unsigned char plain2[N];
-unsigned char cipher2[N];
-unsigned char plainFromDec2[N];
-unsigned char plain4[N];
-unsigned char cipher4[N];
-unsigned char plainFromDec4[N];
-unsigned char plain8[N];
-unsigned char cipher8[N];
-unsigned char plainFromDec8[N];
-unsigned char plain16[N];
-unsigned char cipher16[N];
-unsigned char plainFromDec16[N];
+#include <stdio.h>
+#include "sm4.h"
+
 int main()
 {
-	cout << "加密次数：" << M << endl;
-	cout << "=========平凡SM4========\n";
 	unsigned char key[16] = { 0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10 };
-	unsigned char plain[16] = { 0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10 };
-	unsigned char cipher[16];
-	unsigned char plainFromDec[16];
-	sm4Context ctx;
-	sm4Context ctx2;
-	clock_t start, end;
-	init(plain1, N);
-	init(plain2, N);
-	init(plain4, N);
-	init(plain8, N);
-	init(plain16, N);
-	/* 1.加密测试 */
-	sm4Setkey_Enc(&ctx, key);
-	start = clock();
-	for (int I = 0; I < M; I++)
-	{
-		sm4_1_Round(ctx.sk, plain, cipher);
-	}
-	end = clock();
-	cout << "平凡循环的加密 " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-	//shower(cipher, 16);
+	unsigned char input[16] = { 0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10 };
+	unsigned char output[16];
+	sm4_context ctx;
+	unsigned long i;
 
-	/* 2.解密测试 */
-	sm4Setkey_Dec(&ctx, key);
-	start = clock();
-	for (int I = 0; I < M; I++)
-	{
-		sm4_1_Round(ctx.sk, cipher, plainFromDec);
-	}
-	end = clock();
-	cout << "平凡循环的解密 " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-	//shower(plainFromDec, 16);
+	//encrypt standard testing vector
+	printf("encrypt: ");
+	sm4_setkey_enc(&ctx, key);
+	sm4_crypt_ecb(&ctx, 1, 16, input, output);
+	for (i = 0; i < 16; i++)
+		
+		printf("%02x ", output[i]);
+	printf("\n");
 
+	//decrypt testing
+	printf("decrypt: ");
+	sm4_setkey_dec(&ctx, key);
+	sm4_crypt_ecb(&ctx, 0, 16, output, output);
+	for (i = 0; i < 16; i++)
+		printf("%02x ", output[i]);
+	printf("\n");
 
-
-
-	/* 3.ecb模式测试 */
-	sm4Setkey_Enc(&ctx2, key);
-	start = clock();
-	sm4_ecb(ctx2.sk, plain1, cipher1, N);
-	end = clock();
-	cout << "ecb的加密 " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-
-	sm4Setkey_Dec(&ctx2, key);
-	start = clock();
-	sm4_ecb(ctx2.sk, cipher1, plainFromDec1, N);
-	end = clock();
-	cout << "ecb的解密 " << (double)(end - start) * 1000 / CLOCKS_PER_SEC << "ms\n";
-	//shower(cipher2, len);
-	//shower(plainFromDec2, len);
+}
